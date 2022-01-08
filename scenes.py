@@ -31,31 +31,50 @@ class whats_riemann(Scene):
                 color=GREEN
         )
 
-        e = ValueTracker(1) #Tracks the end value of both functions
-
+        rects = VGroup()
         # the rectangles are constructed from their top right corner.
         # passing an iterable to `color` produces a gradient
-        rects_right = always_redraw(
-                lambda: ax.get_riemann_rectangles(
-                    quadratic,
-                    x_range=[2, 8],
-                    dx=e.get_value(),
-                    # color=(TEAL, RED_B, RED),
-                    input_sample_type="left",
+        for dx in np.arange(0.2, 0.05, -0.05):
+            rect = ax.get_riemann_rectangles(
+                quadratic,
+                            x_range=[2, 8],
+                dx=dx,
+                stroke_width=4*dx,
+                # color=(TEAL, RED_B, RED),
+                input_sample_type="left",
             )
-        )
+            rects.add(rect)
+
 
         self.play(LaggedStart(
             FadeIn(ax), FadeIn(quadratic), FadeIn(question), FadeIn(question_sign),
             run_time=3, lag_ratio=1.0)
             # run_time=0.1, lag_ratio=0.1)
         )
-        self.wait(4)
-        # self.play(Create(rects_right))
+        self.wait(3)
+        # Riemann Rechtecke einblenden
+        self.play(
+            DrawBorderThenFill(
+                    rects[0],
+                    run_time=2,
+                    rate_func=smooth,
+                    lag_ratio=0.5,
+                ),
+            )
+        self.wait()
 
-        # self.wait(2)
-        # self.play(e.animate.set_value(0.04), run_time = 10, rate_func = linear)
-        self.wait(5)
+        # Anzahl erhöhen
+        for rect in rects[1:]:
+            self.play(
+                Transform(
+                    rects[0], rect,
+                    run_time=2,
+                    rate_func=smooth,
+                    lag_ratio=0.5,
+                ),
+            )
+
+
 
 
 # class intro(Scene):
